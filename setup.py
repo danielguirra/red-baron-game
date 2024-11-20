@@ -3,6 +3,7 @@ from plane import Plane
 from alien import Alien, alien_move
 from explosion import Explosion
 from plane import plane_move
+from health_bar import HealthBar
 
 from inactive_animation import inactive_animation
 
@@ -47,6 +48,7 @@ alien = Alien()
 inverter = True
 alien.rect.center = (player_pos.x, player_pos.y - 300)
 alien_life = 100
+alien_helth_bar = HealthBar(x=0, y=0, w=540, h=10, hp=alien_life, max_hp=100)
 
 while running:
     for event in pygame.event.get():
@@ -93,10 +95,16 @@ while running:
         plane,
     )
 
+    alien_helth_bar.draw(screen)
+
     for bullet in bullets:
         bullet.rect.y -= 500 * dt
         if pygame.sprite.collide_rect(bullet, alien):
             alien_life = alien_life - 1
+
+            alien_helth_bar.hp = alien_life
+            alien_helth_bar.draw(screen)
+
             explosion = Explosion(
                 x=alien.rect.x, y=alien.rect.y, sprite_sheet=sprite_sheet_explosion
             )
@@ -105,7 +113,7 @@ while running:
 
             explosion_sprites.draw(screen)
             bullets.remove(bullet)
-            print(alien_life)
+
         if bullet.rect.bottom < 0:
             bullets.remove(bullet)
         screen.blit(bullet.image, bullet.rect)
