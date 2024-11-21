@@ -52,6 +52,10 @@ alien_helth_50 = False
 explosion_sprites = pygame.sprite.Group()
 sprite_sheet_explosion = pygame.image.load("assets/Explosion.png")
 sprite_sheet_explosion = sprite_sheet_explosion.convert_alpha()
+
+plane_audios[4].play(-1).set_volume(0.35)
+plane_audios[5].play(-1).set_volume(0.75)
+
 while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -103,7 +107,7 @@ while running:
         bullet.rect.y -= 500 * dt
 
         if pygame.sprite.collide_rect(bullet, alien):
-            alien.hp = alien.hp - 10
+            alien.hp = alien.hp - 1
 
             if alien.hp <= 50 and not alien_helth_50:
                 alien.speed = alien.speed * 2
@@ -142,10 +146,9 @@ while running:
         if alien_moving:
             alien = alien_moving[0]
             inverter = alien_moving[1]
+            screen.blit(alien.image, alien.rect)
     else:
-        alien.rect.y = 800
-
-    screen.blit(alien.image, alien.rect)
+        alien.rect.y = 3000
 
     screen.blit(plane.image, plane.rect)
     pygame.display.flip()

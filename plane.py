@@ -10,11 +10,14 @@ plane_sprites = [
     pygame.image.load("assets/redbaron-5.png"),
 ]
 pygame.mixer.init(44100, -16, 2, 512)
+
 plane_audios = [
     pygame.mixer.Sound("assets/audio/airplane_prop.ogg"),
-    pygame.mixer.Sound("assets/audio/shoot-5-102360.mp3"),
+    pygame.mixer.Sound("assets/audio/heavy.wav"),
     pygame.mixer.Sound("assets/audio/explosion-shoot.wav"),
     pygame.mixer.Sound("assets/audio/droping.wav"),
+    pygame.mixer.Sound("assets/audio/theme.wav"),
+    pygame.mixer.Sound("assets/audio/airplane_prop.ogg"),
 ]
 
 
