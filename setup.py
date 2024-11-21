@@ -3,6 +3,7 @@ from plane import Plane
 from alien import Alien, alien_move
 from explosion import Explosion
 from plane import plane_move
+from plane import plane_audios
 from health_bar import HealthBar
 
 from inactive_animation import inactive_animation
@@ -26,8 +27,6 @@ player_pos = pygame.Vector2(screen.get_width() / 2, screen.get_height() / 2)
 bullets = []
 space_pressed = False
 
-explosion_sprites = pygame.sprite.Group()
-sprite_sheet_explosion = pygame.image.load("assets/Explosion.png").convert_alpha()
 
 ANIMATION_INTERVAL = 0.025
 INACTIVITY_THRESHOLD = 0.02
@@ -47,9 +46,12 @@ right_image_propeller = 2
 alien = Alien()
 inverter = True
 alien.rect.center = (player_pos.x, player_pos.y - 300)
-alien_life = 100
-alien_helth_bar = HealthBar(x=0, y=0, w=540, h=10, hp=alien_life, max_hp=100)
+alien_helth_bar = HealthBar(x=0, y=0, w=540, h=10, hp=alien.hp, max_hp=100)
+alien_helth_50 = False
 
+explosion_sprites = pygame.sprite.Group()
+sprite_sheet_explosion = pygame.image.load("assets/Explosion.png")
+sprite_sheet_explosion = sprite_sheet_explosion.convert_alpha()
 while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -99,11 +101,27 @@ while running:
 
     for bullet in bullets:
         bullet.rect.y -= 500 * dt
-        if pygame.sprite.collide_rect(bullet, alien):
-            alien_life = alien_life - 1
 
-            alien_helth_bar.hp = alien_life
+        if pygame.sprite.collide_rect(bullet, alien):
+            alien.hp = alien.hp - 10
+
+            if alien.hp <= 50 and not alien_helth_50:
+                alien.speed = alien.speed * 2
+                alien_helth_50 = True
+
+            alien_helth_bar.hp = alien.hp
             alien_helth_bar.draw(screen)
+            bullets.remove(bullet)
+
+            if alien.hp <= 0:
+                alien.death_animation(screen, sprite_sheet_explosion, explosion_sprites)
+                alien.live = False
+                plane_audios[3].play()
+                alien.kill()
+                continue
+
+            if not alien.live:
+                continue
 
             explosion = Explosion(
                 x=alien.rect.x, y=alien.rect.y, sprite_sheet=sprite_sheet_explosion
@@ -112,13 +130,21 @@ while running:
             explosion_sprites.update()
 
             explosion_sprites.draw(screen)
-            bullets.remove(bullet)
+
+            plane_audios[2].play()
 
         if bullet.rect.bottom < 0:
             bullets.remove(bullet)
         screen.blit(bullet.image, bullet.rect)
 
-    [alien, inverter] = alien_move(alien, dt, inverter)
+    if alien.live:
+        alien_moving = alien_move(alien, dt, inverter)
+        if alien_moving:
+            alien = alien_moving[0]
+            inverter = alien_moving[1]
+    else:
+        alien.rect.y = 800
+
     screen.blit(alien.image, alien.rect)
 
     screen.blit(plane.image, plane.rect)
