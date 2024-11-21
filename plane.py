@@ -15,9 +15,6 @@ plane_audios = [
     pygame.mixer.Sound("assets/audio/airplane_prop.ogg"),
     pygame.mixer.Sound("assets/audio/heavy.wav"),
     pygame.mixer.Sound("assets/audio/explosion-shoot.wav"),
-    pygame.mixer.Sound("assets/audio/droping.wav"),
-    pygame.mixer.Sound("assets/audio/theme.wav"),
-    pygame.mixer.Sound("assets/audio/airplane_prop.ogg"),
 ]
 
 

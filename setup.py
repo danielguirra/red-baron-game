@@ -53,8 +53,11 @@ explosion_sprites = pygame.sprite.Group()
 sprite_sheet_explosion = pygame.image.load("assets/Explosion.png")
 sprite_sheet_explosion = sprite_sheet_explosion.convert_alpha()
 
-plane_audios[4].play(-1).set_volume(0.35)
-plane_audios[5].play(-1).set_volume(0.75)
+
+theme_audio = pygame.mixer.Sound("assets/audio/theme.wav")
+theme_audio.play(-1).set_volume(0.35)
+
+plane_audios[0].play(-1).set_volume(0.75)
 
 while running:
     for event in pygame.event.get():
@@ -120,7 +123,7 @@ while running:
             if alien.hp <= 0:
                 alien.death_animation(screen, sprite_sheet_explosion, explosion_sprites)
                 alien.live = False
-                plane_audios[3].play()
+                pygame.mixer.Sound("assets/audio/droping.wav").play()
                 alien.kill()
                 continue
 
