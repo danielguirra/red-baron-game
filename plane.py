@@ -9,6 +9,8 @@ plane_sprites = [
     pygame.image.load("assets/redbaron-4.png"),
     pygame.image.load("assets/redbaron-5.png"),
 ]
+pygame.mixer.init(44100, -16, 2, 512)
+plane_audio = pygame.mixer.Sound("assets/audio/airplane_prop.ogg")
 
 
 class Plane(pygame.sprite.Sprite):
@@ -40,6 +42,7 @@ def plane_move(
     bullets: list,
 ):
     if keys[pygame.K_w]:
+        plane_audio.play(0)
         if updown_image_propeller == 0:
             plane.image = Plane(updown_image_propeller).image
             updown_image_propeller = 1
