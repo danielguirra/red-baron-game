@@ -5,6 +5,8 @@ from explosion import Explosion
 from plane import plane_move
 from plane import plane_audios
 from health_bar import HealthBar
+from paused import paused
+
 
 from inactive_animation import inactive_animation
 
@@ -30,6 +32,7 @@ space_pressed = False
 
 ANIMATION_INTERVAL = 0.025
 INACTIVITY_THRESHOLD = 0.02
+
 last_move_time = pygame.time.get_ticks()
 last_animation_time = pygame.time.get_ticks()
 is_alternating = False
@@ -58,6 +61,8 @@ theme_audio = pygame.mixer.Sound("assets/audio/theme.wav")
 theme_audio.play(-1).set_volume(0.35)
 
 plane_audios[0].play(-1).set_volume(0.75)
+
+pause = False
 
 while running:
     for event in pygame.event.get():
@@ -154,6 +159,7 @@ while running:
         alien.rect.y = 3000
 
     screen.blit(plane.image, plane.rect)
+    paused(pygame=pygame, screen=screen, clock=clock, pause=pause, keys=keys)
     pygame.display.flip()
 
 pygame.quit()
