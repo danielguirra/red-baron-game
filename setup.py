@@ -1,11 +1,11 @@
 import pygame
 from plane import Plane
-from alien import Alien, alien_move
+from alien import Alien
 from explosion import Explosion
-from plane import plane_move
-from plane import plane_audios
+
 from health_bar import HealthBar
 from paused import paused
+from audios import Audios
 
 
 from inactive_animation import inactive_animation
@@ -24,7 +24,6 @@ clock = pygame.time.Clock()
 running = True
 dt = 0
 
-shoting = True
 player_pos = pygame.Vector2(screen.get_width() / 2, screen.get_height() / 2)
 bullets = []
 space_pressed = False
@@ -35,10 +34,9 @@ INACTIVITY_THRESHOLD = 0.02
 
 last_move_time = pygame.time.get_ticks()
 last_animation_time = pygame.time.get_ticks()
-is_alternating = False
-current_sprite = 0
 
-plane = Plane(current_sprite)
+
+plane = Plane()
 plane.rect.center = (player_pos.x, player_pos.y + 300)
 updown_image_propeller = 0
 
@@ -57,10 +55,10 @@ sprite_sheet_explosion = pygame.image.load("assets/Explosion.png")
 sprite_sheet_explosion = sprite_sheet_explosion.convert_alpha()
 
 
-theme_audio = pygame.mixer.Sound("assets/audio/theme.wav")
-theme_audio.play(-1).set_volume(0.35)
+audios = Audios()
+audios.theme.play(-1).set_volume(0.35)
 
-plane_audios[0].play(-1).set_volume(0.75)
+audios.plane_prop.play(-1).set_volume(0.75)
 
 pause = False
 
@@ -75,43 +73,24 @@ while running:
     explosion_sprites.draw(screen)
     keys = pygame.key.get_pressed()
 
-    [
-        last_move_time,
-        is_alternating,
-        space_pressed,
-        shoting,
-        plane,
-        right_image_propeller,
-        leaf_image_propeller,
-        updown_image_propeller,
-    ] = plane_move(
-        updown_image_propeller=updown_image_propeller,
-        leaf_image_propeller=leaf_image_propeller,
-        right_image_propeller=right_image_propeller,
+    plane.plane_move(
         dt=dt,
         keys=keys,
-        space_pressed=space_pressed,
-        shoting=shoting,
-        plane=plane,
         bullets=bullets,
-        last_move_time=last_move_time,
-        is_alternating=is_alternating,
     )
 
-    [is_alternating, current_sprite, plane, last_animation_time] = inactive_animation(
-        last_move_time,
-        INACTIVITY_THRESHOLD,
-        pygame.time.get_ticks(),
-        is_alternating,
-        last_animation_time,
-        ANIMATION_INTERVAL,
-        current_sprite,
-        plane,
+    [plane, last_animation_time] = inactive_animation(
+        INACTIVITY_THRESHOLD=INACTIVITY_THRESHOLD,
+        ticks=pygame.time.get_ticks(),
+        last_animation_time=last_animation_time,
+        ANIMATION_INTERVAL=ANIMATION_INTERVAL,
+        last_move_time=last_move_time,
+        plane=plane,
     )
 
     alien_helth_bar.draw(screen)
 
-    for bullet in bullets:
+    for bullet in plane.bullets:
         bullet.rect.y -= 500 * dt
 
         if pygame.sprite.collide_rect(bullet, alien):
@@ -128,7 +107,7 @@ while running:
             if alien.hp <= 0:
                 alien.death_animation(screen, sprite_sheet_explosion, explosion_sprites)
                 alien.live = False
-                pygame.mixer.Sound("assets/audio/droping.wav").play()
+                audios.alien_droping.play()
                 alien.kill()
                 continue
 
@@ -143,14 +122,14 @@ while running:
 
             explosion_sprites.draw(screen)
 
-            plane_audios[2].play()
+            audios.plane_bullet_explosion.play()
 
         if bullet.rect.bottom < 0:
             bullets.remove(bullet)
         screen.blit(bullet.image, bullet.rect)
 
     if alien.live:
-        alien_moving = alien_move(alien, dt, inverter)
+        alien_moving = alien.alien_move(dt, inverter, screen.get_width())
         if alien_moving:
             alien = alien_moving[0]
             inverter = alien_moving[1]

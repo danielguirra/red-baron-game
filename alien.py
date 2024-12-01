@@ -1,8 +1,6 @@
 import pygame
 from explosion import Explosion
 
-alien_sprite = pygame.image.load("assets/leligena.png")
-
 
 class Alien(pygame.sprite.Sprite):
     def __init__(
@@ -10,7 +8,7 @@ class Alien(pygame.sprite.Sprite):
     ):
         pygame.sprite.Sprite.__init__(self)
 
-        self.image = alien_sprite
+        self.image = pygame.image.load("assets/leligena.png")
 
         self.hp = 100
 
@@ -30,17 +28,17 @@ class Alien(pygame.sprite.Sprite):
         explosion_sprites.draw(screen)
         self.kill()
 
+    def alien_move(self, dt: float, inverter: bool, screen_width: int):
+        maxX = screen_width - self.image.get_width()
+        if not self.live:
+            return
+        if inverter and self.rect.x > 0:
+            self.rect.x -= self.speed * dt
+            if self.rect.x <= 0:
+                inverter = False
+        if not inverter:
+            self.rect.x += self.speed * dt
+            if self.rect.x >= maxX:
+                inverter = True
 
-def alien_move(alien: Alien, dt: float, inverter: bool):
-    if not alien.live:
-        return
-    if inverter and alien.rect.x > 0:
-        alien.rect.x -= alien.speed * dt
-        if alien.rect.x <= 0:
-            inverter = False
-    if not inverter:
-        alien.rect.x += alien.speed * dt
-        if alien.rect.x >= 540:
-            inverter = True
-
-    return alien, inverter
+        return self, inverter
