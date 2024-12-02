@@ -6,7 +6,9 @@ audios = Audios()
 
 
 class Plane(pygame.sprite.Sprite):
-    def __init__(self):
+    def __init__(
+        self,
+    ):
         super().__init__()
         self.space_pressed = False
         self.left_or_right = True
@@ -14,6 +16,7 @@ class Plane(pygame.sprite.Sprite):
         self.right_image_propeller = 0
         self.leaf_image_propeller = 0
         self.is_alternating = False
+        self.last_move_time = pygame.time.get_ticks()
         self.current_sprite = 0
         self.last_shot_time = 0  # Tempo do último disparo
         self.shot_cooldown = 125  # Cooldown em milissegundos
@@ -46,8 +49,10 @@ class Plane(pygame.sprite.Sprite):
         dt: float,
         keys: pygame.key.ScancodeWrapper,
         bullets: list,
+        max_x: int,
+        max_y: int,
     ):
-        if keys[pygame.K_w]:
+        if keys[pygame.K_w] and self.rect.y > 20:
             if self.updown_image_propeller == 0:
                 [self.image, _] = self.get_plane_image(0)
                 self.updown_image_propeller = 1
@@ -56,7 +61,7 @@ class Plane(pygame.sprite.Sprite):
                 self.updown_image_propeller = 0
 
             self.rect.y -= self.speed * dt
-        if keys[pygame.K_s]:
+        if keys[pygame.K_s] and self.rect.y < max_y:
             if self.updown_image_propeller == 0:
                 [self.image, _] = self.get_plane_image(0)
                 self.updown_image_propeller = 1
@@ -74,8 +79,9 @@ class Plane(pygame.sprite.Sprite):
                 self.leaf_image_propeller = 4
 
             self.rect.x -= self.speed * dt
+            self.last_move_time = pygame.time.get_ticks()
             self.is_alternating = False
-        if keys[pygame.K_d] and self.rect.x < 490:
+        if keys[pygame.K_d] and self.rect.x < max_x:
             if self.right_image_propeller == 2:
                 [self.image, _] = self.get_plane_image(2)
                 self.right_image_propeller = 3
@@ -84,6 +90,7 @@ class Plane(pygame.sprite.Sprite):
                 self.right_image_propeller = 2
 
             self.rect.x += self.speed * dt
+            self.last_move_time = pygame.time.get_ticks()
             self.is_alternating = False
 
         current_time = pygame.time.get_ticks()

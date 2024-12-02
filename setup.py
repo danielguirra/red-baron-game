@@ -77,14 +77,17 @@ while running:
         dt=dt,
         keys=keys,
         bullets=bullets,
+        max_x=screen.get_width() - 40,
+        max_y=screen.get_height() - 60,
     )
 
-    [plane, last_animation_time] = inactive_animation(
+    [plane.current_sprite, plane, last_animation_time] = inactive_animation(
         INACTIVITY_THRESHOLD=INACTIVITY_THRESHOLD,
         ticks=pygame.time.get_ticks(),
         last_animation_time=last_animation_time,
         ANIMATION_INTERVAL=ANIMATION_INTERVAL,
-        last_move_time=last_move_time,
+        last_move_time=plane.last_move_time,
+        current_sprite=plane.current_sprite,
         plane=plane,
     )
 
@@ -114,8 +117,14 @@ while running:
             if not alien.live:
                 continue
 
+            alien_position_x = alien.rect.x
+            if alien.in_left:
+                alien_position_x += alien.image.get_width() / 1.25
+
             explosion = Explosion(
-                x=alien.rect.x, y=alien.rect.y, sprite_sheet=sprite_sheet_explosion
+                x=alien_position_x,
+                y=alien.rect.y,
+                sprite_sheet=sprite_sheet_explosion,
             )
             explosion_sprites.add(explosion)
             explosion_sprites.update()

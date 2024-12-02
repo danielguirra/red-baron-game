@@ -12,9 +12,11 @@ class Alien(pygame.sprite.Sprite):
 
         self.hp = 100
 
-        self.speed = 230
+        self.speed = 300
 
         self.live = True
+
+        self.in_left = False
 
         self.rect = self.image.get_rect()
 
@@ -33,10 +35,12 @@ class Alien(pygame.sprite.Sprite):
         if not self.live:
             return
         if inverter and self.rect.x > 0:
+            self.in_left = False
             self.rect.x -= self.speed * dt
             if self.rect.x <= 0:
                 inverter = False
         if not inverter:
+            self.in_left = True
             self.rect.x += self.speed * dt
             if self.rect.x >= maxX:
                 inverter = True
