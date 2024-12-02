@@ -13,3 +13,5 @@ class Audios:
         self.theme = pygame.mixer.Sound("assets/audio/theme.wav")
 
         self.alien_droping = pygame.mixer.Sound("assets/audio/droping.wav")
+
+        self.alien_shot = pygame.mixer.Sound("assets/audio/alien-shot.mp3")

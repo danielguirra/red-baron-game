@@ -1,4 +1,4 @@
-from plane import Plane
+from src.vectors.plane import Plane
 
 
 def inactive_animation(

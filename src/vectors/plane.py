@@ -1,6 +1,6 @@
 import pygame
-from bullet import Bullet
-from audios import Audios
+from src.vectors.bullet import Bullet
+from src.audios.audios import Audios
 
 audios = Audios()
 
@@ -12,14 +12,16 @@ class Plane(pygame.sprite.Sprite):
         super().__init__()
         self.space_pressed = False
         self.left_or_right = True
+        self.life = 100
+
         self.updown_image_propeller = 0
         self.right_image_propeller = 0
         self.leaf_image_propeller = 0
         self.is_alternating = False
         self.last_move_time = pygame.time.get_ticks()
         self.current_sprite = 0
-        self.last_shot_time = 0  # Tempo do último disparo
-        self.shot_cooldown = 125  # Cooldown em milissegundos
+        self.last_shot_time = 0
+        self.shot_cooldown = 120
         [self.image, self.rect] = self.get_plane_image(0)
         self.speed = 300
 

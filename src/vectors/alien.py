@@ -1,5 +1,9 @@
 import pygame
-from explosion import Explosion
+from src.vectors.explosion import Explosion
+from src.vectors.fireball import Fireball
+from src.audios.audios import Audios
+
+audios = Audios()
 
 
 class Alien(pygame.sprite.Sprite):
@@ -12,7 +16,15 @@ class Alien(pygame.sprite.Sprite):
 
         self.hp = 100
 
+        self.fury = False
+
         self.speed = 300
+
+        self.last_shot_time = 0
+
+        self.shot_cooldown = 700
+
+        self.bullets = pygame.sprite.Group()
 
         self.live = True
 
@@ -46,3 +58,17 @@ class Alien(pygame.sprite.Sprite):
                 inverter = True
 
         return self, inverter
+
+    def shot(self, x: int, y: int, sprite_sheets):
+        current_time = pygame.time.get_ticks()
+        if current_time - self.last_shot_time >= self.shot_cooldown:
+            fireball = Fireball(x, y, sprite_sheets)
+            fireball.rect.center = (
+                self.rect.centerx + self.image.get_width() / 1.75,
+                self.rect.bottom,
+            )
+            self.bullets.add(fireball)
+
+            self.last_shot_time = current_time
+            audios.alien_shot.set_volume(0.25)
+            audios.alien_shot.play()

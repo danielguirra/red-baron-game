@@ -1,14 +1,14 @@
 import pygame
-from plane import Plane
-from alien import Alien
-from explosion import Explosion
+from src.vectors.plane import Plane
+from src.vectors.alien import Alien
+from src.vectors.explosion import Explosion
 
-from health_bar import HealthBar
-from paused import paused
-from audios import Audios
+from src.utils.health_bar import HealthBar
+from src.utils.paused import paused
+from src.audios.audios import Audios
 
 
-from inactive_animation import inactive_animation
+from src.utils.inactive_animation import inactive_animation
 
 pygame.init()
 
@@ -54,11 +54,14 @@ explosion_sprites = pygame.sprite.Group()
 sprite_sheet_explosion = pygame.image.load("assets/Explosion.png")
 sprite_sheet_explosion = sprite_sheet_explosion.convert_alpha()
 
+fireball_sprites = pygame.sprite.Group()
+sprite_sheet_fireball = pygame.image.load("assets/alien_shot/Fireball-All.png")
+sprite_sheet_fireball = sprite_sheet_fireball.convert_alpha()
 
 audios = Audios()
 audios.theme.play(-1).set_volume(0.35)
 
-audios.plane_prop.play(-1).set_volume(0.75)
+audios.plane_prop.play(-1).set_volume(0.25)
 
 pause = False
 
@@ -93,10 +96,24 @@ while running:
 
     alien_helth_bar.draw(screen)
 
+    if alien.hp < 60:
+        alien.fury = True
+
+    if alien.fury and alien.live:
+        alien.shot(alien.rect.x, alien.rect.y, sprite_sheet_fireball)
+
+    for bullet in alien.bullets:
+        bullet.rect.y += screen.get_height() * dt
+
+        if bullet.rect.y > screen.get_height():
+            alien.bullets.remove(bullet)
+        else:
+            bullet.update()
+            screen.blit(bullet.image, bullet.rect)
     for bullet in plane.bullets:
         bullet.rect.y -= 500 * dt
 
-        if pygame.sprite.collide_rect(bullet, alien):
+        if pygame.sprite.collide_rect(bullet, alien) and alien.live:
             alien.hp = alien.hp - 1
 
             if alien.hp <= 50 and not alien_helth_50:
@@ -112,9 +129,6 @@ while running:
                 alien.live = False
                 audios.alien_droping.play()
                 alien.kill()
-                continue
-
-            if not alien.live:
                 continue
 
             alien_position_x = alien.rect.x
