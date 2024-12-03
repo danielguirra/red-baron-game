@@ -5,6 +5,7 @@ from src.vectors.explosion import Explosion
 
 from src.utils.health_bar import HealthBar
 from src.utils.paused import paused
+from src.utils.victory import Victory
 from src.audios.audios import Audios
 
 
@@ -38,11 +39,7 @@ last_animation_time = pygame.time.get_ticks()
 
 plane = Plane()
 plane.rect.center = (player_pos.x, player_pos.y + 300)
-updown_image_propeller = 0
 
-leaf_image_propeller = 4
-
-right_image_propeller = 2
 
 alien = Alien()
 inverter = True
@@ -59,7 +56,14 @@ sprite_sheet_fireball = pygame.image.load("assets/alien_shot/Fireball-All.png")
 sprite_sheet_fireball = sprite_sheet_fireball.convert_alpha()
 
 audios = Audios()
-audios.theme.play(-1).set_volume(0.35)
+theme = audios.theme
+theme.play(-1).set_volume(0.35)
+
+boos_music = audios.boos
+
+victory_playning = False
+
+lose_playning = False
 
 audios.plane_prop.play(-1).set_volume(0.25)
 
@@ -82,6 +86,7 @@ while running:
         bullets=bullets,
         max_x=screen.get_width() - 40,
         max_y=screen.get_height() - 60,
+        victory=not alien.live,
     )
 
     [plane.current_sprite, plane, last_animation_time] = inactive_animation(
@@ -96,14 +101,48 @@ while running:
 
     alien_helth_bar.draw(screen)
 
-    if alien.hp < 60:
+    if alien.hp < 95:
         alien.fury = True
 
-    if alien.fury and alien.live:
-        alien.shot(alien.rect.x, alien.rect.y, sprite_sheet_fireball)
+    if alien.fury and alien.live and not lose_playning:
+        if alien.hp < 20:
+            alien.shot_cooldown = 200
+        alien.shot(
+            alien.rect.x - alien.image.get_width(),
+            alien.rect.y,
+            sprite_sheet_fireball,
+        )
 
     for bullet in alien.bullets:
+        if lose_playning:
+            break
         bullet.rect.y += screen.get_height() * dt
+
+        if pygame.sprite.collide_rect(bullet, plane) and plane.alive:
+            if plane.hp <= 0:
+                theme.stop()
+                plane.alive = False
+                plane.rect.y = screen.get_height() + 500
+                if plane.rect.y > screen.get_height():
+                    plane.kill()
+                    audios.alien_droping.play()
+                    boos_music.play(-1)
+                    lose_playning = True
+
+            plane.hp = plane.hp - 10
+
+            alien.bullets.remove(bullet)
+            explosion = Explosion(
+                x=plane.rect.x,
+                y=plane.rect.y,
+                sprite_sheet=sprite_sheet_explosion,
+            )
+            explosion_sprites.add(explosion)
+            explosion_sprites.update()
+
+            explosion_sprites.draw(screen)
+
+            audios.plane_bullet_explosion.play()
 
         if bullet.rect.y > screen.get_height():
             alien.bullets.remove(bullet)
@@ -161,6 +200,12 @@ while running:
         alien.rect.y = 3000
 
     screen.blit(plane.image, plane.rect)
+    if not alien.live:
+        theme.stop()
+        if not victory_playning:
+            audios.victory.play(-1)
+            victory_playning = True
+        Victory(screen=screen)
     paused(pygame=pygame, screen=screen, clock=clock, pause=pause, keys=keys)
     pygame.display.flip()
 

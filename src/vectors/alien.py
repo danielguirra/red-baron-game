@@ -64,11 +64,11 @@ class Alien(pygame.sprite.Sprite):
         if current_time - self.last_shot_time >= self.shot_cooldown:
             fireball = Fireball(x, y, sprite_sheets)
             fireball.rect.center = (
-                self.rect.centerx + self.image.get_width() / 1.75,
+                self.rect.centerx,
                 self.rect.bottom,
             )
             self.bullets.add(fireball)
 
             self.last_shot_time = current_time
-            audios.alien_shot.set_volume(0.25)
+            audios.alien_shot.set_volume(0.025)
             audios.alien_shot.play()

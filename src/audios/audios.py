@@ -15,3 +15,9 @@ class Audios:
         self.alien_droping = pygame.mixer.Sound("assets/audio/droping.wav")
 
         self.alien_shot = pygame.mixer.Sound("assets/audio/alien-shot.mp3")
+
+        self.victory = pygame.mixer.Sound(
+            "assets/audio/Lively Meadow Collection/Lively Meadow Victory and Song Loop A (Plays ONCE).wav"
+        )
+
+        self.boos = pygame.mixer.Sound("assets/audio/boos-loop.mp3")

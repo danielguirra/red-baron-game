@@ -1,3 +1,4 @@
+from typing import List
 import pygame
 from src.vectors.bullet import Bullet
 from src.audios.audios import Audios
@@ -9,10 +10,11 @@ class Plane(pygame.sprite.Sprite):
     def __init__(
         self,
     ):
-        super().__init__()
+        pygame.sprite.Sprite.__init__(self)
         self.space_pressed = False
         self.left_or_right = True
-        self.life = 100
+        self.hp = 100
+        self.alive = True
 
         self.updown_image_propeller = 0
         self.right_image_propeller = 0
@@ -21,9 +23,15 @@ class Plane(pygame.sprite.Sprite):
         self.last_move_time = pygame.time.get_ticks()
         self.current_sprite = 0
         self.last_shot_time = 0
+        self.bullets: List[Bullet] = []
+
         self.shot_cooldown = 120
         [self.image, self.rect] = self.get_plane_image(0)
+
         self.speed = 300
+
+        self.turbo = False
+        self.turbo_time = 0
 
     def get_plane_image(self, sprite: int):
         self.current_sprite = sprite
@@ -53,8 +61,19 @@ class Plane(pygame.sprite.Sprite):
         bullets: list,
         max_x: int,
         max_y: int,
+        victory: bool,
     ):
-        if keys[pygame.K_w] and self.rect.y > 20:
+        if not self.alive:
+            return
+        if self.turbo and pygame.time.get_ticks() - self.turbo_time >= 1000 * 5:
+            self.turbo = False
+            self.shot_cooldown *= 2
+        if keys[pygame.K_t] and not self.turbo:
+            self.turbo = True
+            self.shot_cooldown /= 2
+            self.turbo_time = pygame.time.get_ticks()
+
+        if (keys[pygame.K_w] or keys[pygame.K_UP]) and self.rect.y > 20:
             if self.updown_image_propeller == 0:
                 [self.image, _] = self.get_plane_image(0)
                 self.updown_image_propeller = 1
@@ -63,7 +82,7 @@ class Plane(pygame.sprite.Sprite):
                 self.updown_image_propeller = 0
 
             self.rect.y -= self.speed * dt
-        if keys[pygame.K_s] and self.rect.y < max_y:
+        if (keys[pygame.K_s] or keys[pygame.K_DOWN]) and self.rect.y < max_y:
             if self.updown_image_propeller == 0:
                 [self.image, _] = self.get_plane_image(0)
                 self.updown_image_propeller = 1
@@ -72,7 +91,7 @@ class Plane(pygame.sprite.Sprite):
                 self.updown_image_propeller = 0
 
             self.rect.y += self.speed * dt
-        if keys[pygame.K_a] and self.rect.x > 0:
+        if (keys[pygame.K_a] or keys[pygame.K_LEFT]) and self.rect.x > 0:
             if self.leaf_image_propeller == 4:
                 [self.image, _] = self.get_plane_image(4)
                 self.leaf_image_propeller = 5
@@ -83,7 +102,7 @@ class Plane(pygame.sprite.Sprite):
             self.rect.x -= self.speed * dt
             self.last_move_time = pygame.time.get_ticks()
             self.is_alternating = False
-        if keys[pygame.K_d] and self.rect.x < max_x:
+        if (keys[pygame.K_d] or keys[pygame.K_RIGHT]) and self.rect.x < max_x:
             if self.right_image_propeller == 2:
                 [self.image, _] = self.get_plane_image(2)
                 self.right_image_propeller = 3
@@ -99,6 +118,7 @@ class Plane(pygame.sprite.Sprite):
         if (
             keys[pygame.K_SPACE]
             and current_time - self.last_shot_time >= self.shot_cooldown
+            and not victory
         ):
             bullet = Bullet(self.left_or_right)
             bullet.rect.center = (self.rect.x + 30, self.rect.y)

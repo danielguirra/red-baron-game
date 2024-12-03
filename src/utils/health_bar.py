@@ -15,3 +15,6 @@ class HealthBar:
 
         pygame.draw.rect(surface, "red", (self.x, self.y, self.w, self.h))
         pygame.draw.rect(surface, "green", (self.x, self.y, self.w * ratio, self.h))
+
+        if self.hp <= 0:
+            pygame.draw.rect(surface, "gray", (self.x, self.y, self.w, self.h))
