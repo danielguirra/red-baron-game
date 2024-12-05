@@ -25,13 +25,14 @@ class Plane(pygame.sprite.Sprite):
         self.last_shot_time = 0
         self.bullets: List[Bullet] = []
 
-        self.shot_cooldown = 120
+        self.shot_cooldown = 200
         [self.image, self.rect] = self.get_plane_image(0)
 
         self.speed = 300
 
         self.turbo = False
         self.turbo_time = 0
+        self.fire = False
 
     def get_plane_image(self, sprite: int):
         self.current_sprite = sprite
@@ -119,7 +120,9 @@ class Plane(pygame.sprite.Sprite):
             keys[pygame.K_SPACE]
             and current_time - self.last_shot_time >= self.shot_cooldown
             and not victory
+            and not self.fire
         ):
+            self.fire = True
             bullet = Bullet(self.left_or_right)
             bullet.rect.center = (self.rect.x + 30, self.rect.y)
 
@@ -127,4 +130,5 @@ class Plane(pygame.sprite.Sprite):
             self.last_shot_time = current_time
             self.left_or_right = not self.left_or_right
             audios.plane_bullet.play()
+            self.fire = False
         self.bullets = bullets

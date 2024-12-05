@@ -6,6 +6,7 @@ from src.vectors.explosion import Explosion
 from src.utils.health_bar import HealthBar
 from src.utils.paused import paused
 from src.utils.victory import Victory
+from src.utils.lose import lose
 from src.audios.audios import Audios
 
 
@@ -65,7 +66,8 @@ victory_playning = False
 
 lose_playning = False
 
-audios.plane_prop.play(-1).set_volume(0.25)
+plane_prop_audio = audios.plane_prop
+plane_prop_audio.play(-1).set_volume(0.25)
 
 pause = False
 
@@ -74,6 +76,11 @@ while running:
         if event.type == pygame.QUIT:
             running = False
 
+    if lose_playning:
+        audios.boos.play(-1)
+        lose_playning = not lose_playning
+    if not plane.alive:
+        plane_prop_audio.stop()
     dt = clock.tick(60) / 1000
     explosion_sprites.update()
     screen.fill("gray")
@@ -206,6 +213,8 @@ while running:
             audios.victory.play(-1)
             victory_playning = True
         Victory(screen=screen)
+    if not plane.alive:
+        lose(screen=screen)
     paused(pygame=pygame, screen=screen, clock=clock, pause=pause, keys=keys)
     pygame.display.flip()
 
