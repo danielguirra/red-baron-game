@@ -45,8 +45,13 @@ plane.rect.center = (player_pos.x, player_pos.y + 300)
 alien = Alien()
 inverter = True
 alien.rect.center = (player_pos.x, player_pos.y - 300)
-alien_helth_bar = HealthBar(x=0, y=0, w=540, h=10, hp=alien.hp, max_hp=100)
-alien_helth_50 = False
+helth_bar_alien = HealthBar(x=0, y=0, w=540, h=10, hp=alien.hp, max_hp=100)
+
+
+helth_bar_plane = HealthBar(
+    x=0, y=screen.get_height() - 10, w=540, h=10, hp=alien.hp, max_hp=100
+)
+
 
 explosion_sprites = pygame.sprite.Group()
 sprite_sheet_explosion = pygame.image.load("assets/Explosion.png")
@@ -56,15 +61,24 @@ fireball_sprites = pygame.sprite.Group()
 sprite_sheet_fireball = pygame.image.load("assets/alien_shot/Fireball-All.png")
 sprite_sheet_fireball = sprite_sheet_fireball.convert_alpha()
 
+laser_sprites = pygame.sprite.Group()
+sprite_sheet_laser = pygame.image.load("assets/alien_shot/Laser/laser.png")
+sprite_sheet_laser = sprite_sheet_laser.convert_alpha()
+
 audios = Audios()
-theme = audios.theme
-theme.play(-1).set_volume(0.35)
+theme = pygame.mixer.music
+theme.load("assets/audio/theme.wav")
+theme.play(-1)
+theme.set_volume(0.35)
 
-boos_music = audios.boos
+boos_music = pygame.mixer.music
 
-victory_playning = False
+victory_music = pygame.mixer.Sound("assets/audio/Lively Meadow Collection/loop.wav")
 
+win = True
 lose_playning = False
+
+left_alien_shot = False
 
 plane_prop_audio = audios.plane_prop
 plane_prop_audio.play(-1).set_volume(0.25)
@@ -77,8 +91,13 @@ while running:
             running = False
 
     if lose_playning:
-        audios.boos.play(-1)
+        # Pare qualquer música anterior
+        pygame.mixer.music.stop()
+        # Carregue e toque a música de derrota em loop
+        boos_music.load("assets/audio/boos-loop.wav")
+        boos_music.play(-1)
         lose_playning = not lose_playning
+
     if not plane.alive:
         plane_prop_audio.stop()
     dt = clock.tick(60) / 1000
@@ -106,19 +125,27 @@ while running:
         plane=plane,
     )
 
-    alien_helth_bar.draw(screen)
+    helth_bar_alien.draw(screen, "red", "green")
+
+    helth_bar_plane.draw(screen, "orange", "yellow")
 
     if alien.hp < 95:
         alien.fury = True
 
-    if alien.fury and alien.live and not lose_playning:
-        if alien.hp < 20:
+    if alien.fury and alien.live and not lose_playning and plane.alive:
+        shot_sprite = sprite_sheet_laser
+        x = alien.rect.x - alien.image.get_width()
+
+        if alien.hp < 30:
             alien.shot_cooldown = 200
+            shot_sprite = sprite_sheet_fireball
         alien.shot(
-            alien.rect.x - alien.image.get_width(),
+            x,
             alien.rect.y,
-            sprite_sheet_fireball,
+            shot_sprite,
         )
+
+        left_alien_shot = not left_alien_shot
 
     for bullet in alien.bullets:
         if lose_playning:
@@ -149,6 +176,8 @@ while running:
 
             explosion_sprites.draw(screen)
 
+            helth_bar_plane.hp = plane.hp
+
             audios.plane_bullet_explosion.play()
 
         if bullet.rect.y > screen.get_height():
@@ -160,14 +189,13 @@ while running:
         bullet.rect.y -= 500 * dt
 
         if pygame.sprite.collide_rect(bullet, alien) and alien.live:
-            alien.hp = alien.hp - 1
+            alien.hp = alien.hp - 100
 
-            if alien.hp <= 50 and not alien_helth_50:
-                alien.speed = alien.speed * 2
-                alien_helth_50 = True
+            if alien.hp <= 50:
+                alien.speed = 600
 
-            alien_helth_bar.hp = alien.hp
-            alien_helth_bar.draw(screen)
+            helth_bar_alien.hp = alien.hp
+            helth_bar_alien.draw(screen, "red", "green")
             bullets.remove(bullet)
 
             if alien.hp <= 0:
@@ -207,12 +235,11 @@ while running:
         alien.rect.y = 3000
 
     screen.blit(plane.image, plane.rect)
+
     if not alien.live:
         theme.stop()
-        if not victory_playning:
-            audios.victory.play(-1)
-            victory_playning = True
-        Victory(screen=screen)
+        win = Victory(screen=screen, win=win, victory_music=victory_music)
+
     if not plane.alive:
         lose(screen=screen)
     paused(pygame=pygame, screen=screen, clock=clock, pause=pause, keys=keys)

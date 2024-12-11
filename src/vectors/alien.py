@@ -1,6 +1,7 @@
 import pygame
 from src.vectors.explosion import Explosion
 from src.vectors.fireball import Fireball
+from src.vectors.laser import Laser
 from src.audios.audios import Audios
 
 audios = Audios()
@@ -62,13 +63,27 @@ class Alien(pygame.sprite.Sprite):
     def shot(self, x: int, y: int, sprite_sheets):
         current_time = pygame.time.get_ticks()
         if current_time - self.last_shot_time >= self.shot_cooldown:
-            fireball = Fireball(x, y, sprite_sheets)
-            fireball.rect.center = (
-                self.rect.centerx,
-                self.rect.bottom,
-            )
-            self.bullets.add(fireball)
+            if self.hp < 30:
+                fireball = Fireball(x, y, sprite_sheets)
+                fireball.rect.center = (
+                    self.rect.centerx,
+                    self.rect.bottom,
+                )
+                self.bullets.add(fireball)
 
-            self.last_shot_time = current_time
-            audios.alien_shot.set_volume(0.025)
-            audios.alien_shot.play()
+                self.last_shot_time = current_time
+                audios.alien_shot.set_volume(0.025)
+                audios.alien_shot.play()
+                return
+            else:
+                laser = Laser(x, y, sprite_sheets)
+                laser.rect.center = (
+                    self.rect.centerx,
+                    self.rect.bottom,
+                )
+                self.bullets.add(laser)
+
+                self.last_shot_time = current_time
+                audios.alien_shot.set_volume(0.025)
+                audios.alien_shot.play()
+                return
