@@ -72,7 +72,7 @@ class Alien(pygame.sprite.Sprite):
                 self.bullets.add(fireball)
 
                 self.last_shot_time = current_time
-                audios.alien_shot.set_volume(0.025)
+                audios.alien_shot.set_volume(0.12)
                 audios.alien_shot.play()
                 return
             else:
@@ -84,6 +84,6 @@ class Alien(pygame.sprite.Sprite):
                 self.bullets.add(laser)
 
                 self.last_shot_time = current_time
-                audios.alien_shot.set_volume(0.025)
+                audios.alien_shot.set_volume(0.06)
                 audios.alien_shot.play()
                 return

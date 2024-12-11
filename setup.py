@@ -45,11 +45,16 @@ plane.rect.center = (player_pos.x, player_pos.y + 300)
 alien = Alien()
 inverter = True
 alien.rect.center = (player_pos.x, player_pos.y - 300)
-helth_bar_alien = HealthBar(x=0, y=0, w=540, h=10, hp=alien.hp, max_hp=100)
+health_bar_alien = HealthBar(x=0, y=0, w=540, h=10, hp=alien.hp, max_hp=100)
 
 
-helth_bar_plane = HealthBar(
-    x=0, y=screen.get_height() - 10, w=540, h=10, hp=alien.hp, max_hp=100
+health_bar_plane = HealthBar(
+    x=0,
+    y=screen.get_height() / 2.20,
+    w=10,
+    h=screen.get_height() / 2.25,
+    hp=plane.hp,
+    max_hp=100,
 )
 
 
@@ -69,11 +74,10 @@ audios = Audios()
 theme = pygame.mixer.music
 theme.load("assets/audio/theme.wav")
 theme.play(-1)
-theme.set_volume(0.35)
+theme.set_volume(0.09)
 
 boos_music = pygame.mixer.music
 
-victory_music = pygame.mixer.Sound("assets/audio/Lively Meadow Collection/loop.wav")
 
 win = True
 lose_playning = False
@@ -91,9 +95,7 @@ while running:
             running = False
 
     if lose_playning:
-        # Pare qualquer música anterior
         pygame.mixer.music.stop()
-        # Carregue e toque a música de derrota em loop
         boos_music.load("assets/audio/boos-loop.wav")
         boos_music.play(-1)
         lose_playning = not lose_playning
@@ -125,9 +127,9 @@ while running:
         plane=plane,
     )
 
-    helth_bar_alien.draw(screen, "red", "green")
+    health_bar_alien.drawX(screen, "red", "green")
 
-    helth_bar_plane.draw(screen, "orange", "yellow")
+    health_bar_plane.drawY(screen, "red", "white")
 
     if alien.hp < 95:
         alien.fury = True
@@ -150,6 +152,7 @@ while running:
     for bullet in alien.bullets:
         if lose_playning:
             break
+
         bullet.rect.y += screen.get_height() * dt
 
         if pygame.sprite.collide_rect(bullet, plane) and plane.alive:
@@ -163,9 +166,10 @@ while running:
                     boos_music.play(-1)
                     lose_playning = True
 
-            plane.hp = plane.hp - 10
-
+            plane.hp -= 10
+            health_bar_alien.drawY(screen, "red", "white")
             alien.bullets.remove(bullet)
+
             explosion = Explosion(
                 x=plane.rect.x,
                 y=plane.rect.y,
@@ -173,13 +177,10 @@ while running:
             )
             explosion_sprites.add(explosion)
             explosion_sprites.update()
-
             explosion_sprites.draw(screen)
 
-            helth_bar_plane.hp = plane.hp
-
+            health_bar_plane.hp = plane.hp
             audios.plane_bullet_explosion.play()
-
         if bullet.rect.y > screen.get_height():
             alien.bullets.remove(bullet)
         else:
@@ -189,13 +190,13 @@ while running:
         bullet.rect.y -= 500 * dt
 
         if pygame.sprite.collide_rect(bullet, alien) and alien.live:
-            alien.hp = alien.hp - 100
+            alien.hp = alien.hp - 1.5
 
             if alien.hp <= 50:
                 alien.speed = 600
 
-            helth_bar_alien.hp = alien.hp
-            helth_bar_alien.draw(screen, "red", "green")
+            health_bar_alien.hp = alien.hp
+            health_bar_alien.drawX(screen, "red", "green")
             bullets.remove(bullet)
 
             if alien.hp <= 0:
@@ -237,8 +238,9 @@ while running:
     screen.blit(plane.image, plane.rect)
 
     if not alien.live:
+        plane_prop_audio.stop()
         theme.stop()
-        win = Victory(screen=screen, win=win, victory_music=victory_music)
+        win = Victory(screen=screen, win=win)
 
     if not plane.alive:
         lose(screen=screen)

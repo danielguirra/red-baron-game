@@ -29,10 +29,8 @@ class Laser(pygame.sprite.Sprite):
 
     def update(self):
         now = pygame.time.get_ticks()
-        if now - self.last_update > self.animation_speed * 1000:
+        if now - self.last_update > self.animation_speed * 756:
             self.last_update = now
             self.index += 1
             if self.index < len(self.frames):
                 self.image = self.frames[self.index]
-            else:
-                self.kill()
