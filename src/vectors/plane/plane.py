@@ -1,6 +1,6 @@
 from typing import List
 import pygame
-from src.vectors.bullet import Bullet
+from src.vectors.plane.bullet import Bullet
 from src.audios.audios import Audios
 
 audios = Audios()

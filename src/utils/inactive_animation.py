@@ -1,4 +1,4 @@
-from src.vectors.plane import Plane
+from src.vectors.plane.plane import Plane
 
 
 def inactive_animation(
@@ -19,4 +19,4 @@ def inactive_animation(
         current_sprite = 1 if current_sprite == 0 else 0
         [plane.image, _] = plane.get_plane_image(current_sprite)
         last_animation_time = ticks
-    return [current_sprite, plane, last_animation_time]
+    return (current_sprite, plane, last_animation_time)

@@ -1,7 +1,7 @@
 import pygame
-from src.vectors.explosion import Explosion
-from src.vectors.fireball import Fireball
-from src.vectors.laser import Laser
+from src.vectors.explosion.explosion import Explosion
+from src.vectors.alien.fireball import Fireball
+from src.vectors.alien.laser import Laser
 from src.audios.audios import Audios
 
 audios = Audios()
@@ -29,6 +29,8 @@ class Alien(pygame.sprite.Sprite):
 
         self.live = True
 
+        self.alien_inverter_left_right = True
+
         self.in_left = False
 
         self.rect = self.image.get_rect()
@@ -43,22 +45,22 @@ class Alien(pygame.sprite.Sprite):
         explosion_sprites.draw(screen)
         self.kill()
 
-    def alien_move(self, dt: float, inverter: bool, screen_width: int):
+    def alien_move(self, dt: float, screen_width: int):
         maxX = screen_width - self.image.get_width()
         if not self.live:
             return
-        if inverter and self.rect.x > 0:
+        if self.alien_inverter_left_right and self.rect.x > 0:
             self.in_left = False
             self.rect.x -= self.speed * dt
             if self.rect.x <= 0:
-                inverter = False
-        if not inverter:
+                self.alien_inverter_left_right = False
+        if not self.alien_inverter_left_right:
             self.in_left = True
             self.rect.x += self.speed * dt
             if self.rect.x >= maxX:
-                inverter = True
+                self.alien_inverter_left_right = True
 
-        return self, inverter
+        return self
 
     def shot(self, x: int, y: int, sprite_sheets):
         current_time = pygame.time.get_ticks()

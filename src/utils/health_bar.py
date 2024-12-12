@@ -20,24 +20,19 @@ class HealthBar:
             pygame.draw.rect(surface, "gray", (self.x, self.y, self.w, self.h))
 
     def drawY(self, surface: pygame.Surface, color1: str, color2: str):
-        # Calcula a proporção da vida restante
         ratio = self.hp / self.max_hp
 
-        # Desenha o retângulo de fundo (cor1)
         pygame.draw.rect(surface, color1, (self.x, self.y, self.w, self.h))
-
-        # Desenha o retângulo da barra de vida restante (cor2)
         pygame.draw.rect(
             surface,
             color2,
             (
                 self.x,
-                self.y + (self.h * (1 - ratio)),  # Ajusta a posição inicial em Y
+                self.y + (self.h * (1 - ratio)),
                 self.w,
-                self.h * ratio,  # Ajusta a altura proporcional
+                self.h * ratio,
             ),
         )
 
-        # Quando a vida é 0, desenha em cinza
         if self.hp <= 0:
             pygame.draw.rect(surface, "gray", (self.x, self.y, self.w, self.h))
