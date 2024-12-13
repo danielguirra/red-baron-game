@@ -2,6 +2,9 @@
 
 **Red Baron Game** é um jogo simples e divertido, desenvolvido em Python utilizando a biblioteca `pygame`. Prepare-se para assumir os céus e enfrentar desafios emocionantes!
 
+![image](https://github.com/user-attachments/assets/e7cd1952-2516-42ff-8df0-32e0b97972fd)
+
+
 ## Pré-requisitos
 
 Certifique-se de ter o Python 3 instalado no seu sistema. Você pode verificar isso executando:
@@ -40,6 +43,12 @@ Siga os passos abaixo para configurar e executar o jogo:
    ```bash
    python3 setup.py
    ```
+
+## Controles
+   WASD ou Setas para mover o avião
+   Espaço atirar
+   T modo turbo
+   P pause
 
 ## Sobre o jogo
 
