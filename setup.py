@@ -1,22 +1,29 @@
 import pygame
 import pygame_menu.events
+import pygame_menu.font
+import pygame_menu.locals
 import pygame_menu.themes
-from src.vectors.plane.plane import Plane
-from src.vectors.alien.alien import Alien
+import pygame_menu
+import sys
+
+import pygame_menu.widgets
 
 from src.utils.health_bar import HealthBar
 from src.utils.paused import paused
 from src.utils.victory import Victory
 from src.utils.lose import lose
+from src.utils.inactive_animation import inactive_animation
+
 from src.audios.audios import Audios
+
 from src.config.screen import Screen
+
 from src.vectors.alien.handle_alien_attack import handle_alien_attack
 from src.vectors.alien.handle_alien_bullets import handle_alien_bullets
 from src.vectors.plane.handle_plane_bullets import handle_plane_bullets
+from src.vectors.plane.plane import Plane
+from src.vectors.alien.alien import Alien
 
-import pygame_menu
-
-from src.utils.inactive_animation import inactive_animation
 
 pygame.init()
 
@@ -36,12 +43,10 @@ def game():
     dt = 0
     player_pos = pygame.Vector2(screen.get_width() / 2, screen.get_height() / 2)
     bullets = []
-    space_pressed = False
 
     ANIMATION_INTERVAL = 0.025
     INACTIVITY_THRESHOLD = 0.02
 
-    last_move_time = pygame.time.get_ticks()
     last_animation_time = pygame.time.get_ticks()
 
     alien = Alien()
@@ -63,15 +68,14 @@ def game():
     sprite_sheet_explosion = pygame.image.load("assets/Explosion.png")
     sprite_sheet_explosion = sprite_sheet_explosion.convert_alpha()
 
-    fireball_sprites = pygame.sprite.Group()
     sprite_sheet_fireball = pygame.image.load("assets/alien_shot/Fireball-All.png")
     sprite_sheet_fireball = sprite_sheet_fireball.convert_alpha()
 
-    laser_sprites = pygame.sprite.Group()
     sprite_sheet_laser = pygame.image.load("assets/alien_shot/Laser/laser.png")
     sprite_sheet_laser = sprite_sheet_laser.convert_alpha()
 
     audios = Audios()
+
     theme = pygame.mixer.music
     theme.load("assets/audio/theme.wav")
     theme.play(-1)
@@ -96,6 +100,7 @@ def game():
                 theme.stop()
                 running = False
                 pygame.quit()
+                sys.exit()
 
         if lose_playning:
             pygame.mixer.music.stop()
@@ -142,6 +147,7 @@ def game():
                 health_bar_alien,
                 audios,
             )
+
             health_bar_plane.drawY(screen, "red", "white")
 
         if alien.live:
@@ -170,10 +176,13 @@ def game():
                 sprite_sheet_explosion,
                 explosion_sprites,
             )
+
             alien.alien_move(dt, screen.get_width())
 
             screen.blit(alien.image, alien.rect)
+
             health_bar_alien.drawX(screen, "red", "green")
+
         else:
             alien.rect.y = 3000
             alien.kill()
@@ -187,13 +196,25 @@ def game():
 
         if not plane.alive:
             lose(screen=screen)
+
         paused(pygame, screen, clock, pause, keys)
         pygame.display.flip()
 
 
-theme = pygame_menu.themes.THEME_DARK
+font_menu_buttons = pygame_menu.font.FONT_DIGITAL
 
-theme.title_font.__sizeof__
+theme = pygame_menu.Theme(
+    background_color=(0, 0, 0, 0),  # transparent background
+    title_background_color=(4, 47, 126),
+    title_font_shadow=True,
+    widget_padding=25,
+    title_bar_style=pygame_menu.widgets.MENUBAR_STYLE_NONE,
+    widget_alignment=pygame_menu.locals.ALIGN_CENTER,
+    widget_font=font_menu_buttons,
+    title_font=font_menu_buttons,
+    title_font_size=20,
+)
+
 
 menu = pygame_menu.Menu(
     "Barão Vermelhão VS LELIGENA",
@@ -201,6 +222,8 @@ menu = pygame_menu.Menu(
     screen.get_height(),
     theme=theme,
 )
+
+
 # menu.add.selector("Difficulty :", [("Hard", 1), ("Easy", 2)], onchange=set_difficulty)
 menu.add.button("Play", game)
 menu.add.button("Quit", pygame_menu.events.EXIT)
