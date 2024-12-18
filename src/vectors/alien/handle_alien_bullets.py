@@ -31,6 +31,7 @@ def handle_alien_bullets(
                 if plane.rect.y > screen.get_height():
                     plane.kill()
                     audios.alien_droping.play()
+                    boos_music.set_volume(0.75)
                     boos_music.play(-1)
                     lose_playning = True
             plane.hp -= 10

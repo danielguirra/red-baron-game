@@ -6,6 +6,7 @@ import pygame_menu.themes
 import pygame_menu
 import sys
 
+from src.utils.scale_image import scale_image
 import pygame_menu.widgets
 
 from src.utils.health_bar import HealthBar
@@ -68,11 +69,18 @@ def game():
     sprite_sheet_explosion = pygame.image.load("assets/Explosion.png")
     sprite_sheet_explosion = sprite_sheet_explosion.convert_alpha()
 
+    sprite_sheet_bullet = pygame.image.load("assets/bullets/bullet-r.png")
+    sprite_sheet_bullet = sprite_sheet_bullet.convert_alpha()
+
     sprite_sheet_fireball = pygame.image.load("assets/alien_shot/Fireball-All.png")
     sprite_sheet_fireball = sprite_sheet_fireball.convert_alpha()
 
     sprite_sheet_laser = pygame.image.load("assets/alien_shot/Laser/laser.png")
     sprite_sheet_laser = sprite_sheet_laser.convert_alpha()
+
+    background = pygame.image.load("assets/scene/background.png")
+    background = scale_image(background, 2)
+    background = background.convert_alpha()
 
     audios = Audios()
 
@@ -112,7 +120,7 @@ def game():
             plane_prop_audio.stop()
         dt = clock.tick(60) / 1000
         explosion_sprites.update()
-        screen.fill("gray")
+        screen.blit(background, (0, 0))
         explosion_sprites.draw(screen)
         keys = pygame.key.get_pressed()
 
@@ -124,6 +132,7 @@ def game():
                 max_x=screen.get_width() - 40,
                 max_y=screen.get_height() - 60,
                 victory=not alien.live,
+                sprite_sheet=sprite_sheet_bullet,
             )
 
             (plane.current_sprite, plane, last_animation_time) = inactive_animation(

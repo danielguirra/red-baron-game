@@ -17,7 +17,7 @@ def handle_plane_bullets(
     audios: Audios,
 ):
     for bullet in plane.bullets:
-        bullet.rect.y -= 500 * dt
+        bullet.update(dt)
 
         if pygame.sprite.collide_rect(bullet, alien) and alien.live:
             alien.hp -= 1.5
