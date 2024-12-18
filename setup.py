@@ -14,6 +14,8 @@ from src.utils.paused import paused
 from src.utils.victory import Victory
 from src.utils.lose import lose
 from src.utils.inactive_animation import inactive_animation
+from src.utils.clock import clock_timer
+from src.utils.draw_scrolling_background import draw_scrolling_background
 
 from src.audios.audios import Audios
 
@@ -28,11 +30,12 @@ from src.vectors.alien.alien import Alien
 
 pygame.init()
 
-
 screen = Screen(
     540,
     740,
 )
+
+start_time = pygame.time.get_ticks()
 
 running = True
 
@@ -82,6 +85,9 @@ def game():
     background = scale_image(background, 2)
     background = background.convert_alpha()
 
+    background_speed = 200
+    background_positions = [0, -screen.get_height()]
+
     audios = Audios()
 
     theme = pygame.mixer.music
@@ -120,10 +126,16 @@ def game():
             plane_prop_audio.stop()
         dt = clock.tick(60) / 1000
         explosion_sprites.update()
-        screen.blit(background, (0, 0))
+
+        draw_scrolling_background(
+            screen, background, background_speed, dt, background_positions
+        )
+
         explosion_sprites.draw(screen)
         keys = pygame.key.get_pressed()
 
+        current_time = (pygame.time.get_ticks() - start_time) / 1000
+        clock_timer(current_time, screen)
         if plane.alive:
             plane.plane_move(
                 dt=dt,
