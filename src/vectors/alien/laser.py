@@ -1,5 +1,7 @@
 import pygame
 
+from src.utils.scale_image import scale_image
+
 
 class Laser(pygame.sprite.Sprite):
     def __init__(self, x, y, sprite_sheet):
@@ -22,9 +24,7 @@ class Laser(pygame.sprite.Sprite):
                 pygame.Rect(i * frame_width, 0, frame_width, frame_height)
             )
 
-            scaled_frame = pygame.transform.scale(
-                frame, (frame_width * scale_factor, frame_height * scale_factor)
-            )
+            scaled_frame = scale_image(frame, scale_factor)
             self.frames.append(scaled_frame)
 
     def update(self):

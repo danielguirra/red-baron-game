@@ -63,6 +63,7 @@ class Plane(pygame.sprite.Sprite):
         max_x: int,
         max_y: int,
         victory: bool,
+        sprite_sheet,
     ):
         if not self.alive:
             return
@@ -123,7 +124,12 @@ class Plane(pygame.sprite.Sprite):
             and not self.fire
         ):
             self.fire = True
-            bullet = Bullet(self.left_or_right)
+            bullet = Bullet(
+                shotting=self.left_or_right,
+                x=self.rect.x + 30,
+                y=self.rect.y,
+                sprite_sheet=sprite_sheet,
+            )
             bullet.rect.center = (self.rect.x + 30, self.rect.y)
 
             bullets.append(bullet)
