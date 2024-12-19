@@ -33,7 +33,6 @@ def handle_alien_bullets(
                     audios.alien_droping.play()
                     boos_music.set_volume(0.75)
                     boos_music.play(-1)
-                    lose_playning = True
             plane.hp -= 10
             alien.bullets.remove(bullet)
             explosion = Explosion(
@@ -53,5 +52,3 @@ def handle_alien_bullets(
         else:
             bullet.update()
             screen.blit(bullet.image, bullet.rect)
-
-    return lose_playning
