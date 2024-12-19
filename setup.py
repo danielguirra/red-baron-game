@@ -100,6 +100,8 @@ def game():
     win = True
     lose_playning = False
 
+    play_again_label = None
+
     left_alien_shot = False
 
     plane_prop_audio = audios.plane_prop
@@ -109,18 +111,28 @@ def game():
 
     while running:
         for event in pygame.event.get():
+            if lose_playning:
+                pygame.mixer.music.stop()
+                boos_music.load("assets/audio/boos-loop.wav")
+                boos_music.play(-1)
+                lose_playning = not lose_playning
             if event.type == pygame.QUIT:
                 plane_prop_audio.stop()
                 theme.stop()
                 running = False
                 pygame.quit()
                 sys.exit()
+            if not win:
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    if pygame.mouse.get_pressed()[0]:
+                        mouse_pos = pygame.mouse.get_pos()
+                        mouse_rect = pygame.Rect(mouse_pos[0], mouse_pos[1], 1, 1)
+                        if play_again_label.rect.colliderect(mouse_rect):
+                            game()
 
-        if lose_playning:
-            pygame.mixer.music.stop()
-            boos_music.load("assets/audio/boos-loop.wav")
-            boos_music.play(-1)
-            lose_playning = not lose_playning
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_RETURN:
+                        game()
 
         if not plane.alive:
             plane_prop_audio.stop()
@@ -184,19 +196,19 @@ def game():
                     sprite_sheet_fireball,
                 )
 
-            lose_playning = handle_alien_bullets(
-                alien,
-                plane,
-                screen,
-                dt,
-                lose_playning,
-                theme,
-                audios,
-                boos_music,
-                health_bar_plane,
-                sprite_sheet_explosion,
-                explosion_sprites,
-            )
+                handle_alien_bullets(
+                    alien,
+                    plane,
+                    screen,
+                    dt,
+                    lose_playning,
+                    theme,
+                    audios,
+                    boos_music,
+                    health_bar_plane,
+                    sprite_sheet_explosion,
+                    explosion_sprites,
+                )
 
             alien.alien_move(dt, screen.get_width())
 
@@ -216,7 +228,9 @@ def game():
             win = Victory(screen=screen, win=win)
 
         if not plane.alive:
-            lose(screen=screen)
+            win = False
+            lose_playning = True
+            play_again_label = lose(screen=screen)
 
         paused(pygame, screen, clock, pause, keys)
         pygame.display.flip()
